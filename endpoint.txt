@@ -1,0 +1,39 @@
+endpoint:
+1. Register
+-POST /v1/auth/register
+
+2. Login
+-POST /v1/auth/login
+
+3. Dashboard User
+- GET /v1/user/dashboardUser/
+- POST /v1/user/dashboardUser/acceptRequest
+- POST /v1/user/dashboardUser/rejectRequest
+
+4. Jadwal Donor Darah
+GET /v1/user/jadwal/
+GET /v1/user/jadwal/detail/:id
+POST /v1/user/jadwal/daftar
+POST /v1/user/jadwal/daftar/cari
+
+5. Volunteer Donor Darah
+- GET /v1/user/volunteer/search
+- POST /v1/user/volunteer/request
+
+6. User Profile
+- GET /v1/user/userProfile/
+- PUT /v1/user/userProfile/update
+
+7. Dashboard Admin
+GET /v1/admin/dashboardAdmin
+
+8. Bank Darah
+GET /v1/admin/bankDarah/:id
+PUT /v1/admin/bankDarah/update/:id
+
+9. List Pendonor Darah
+GET /v1/admin/pendonorDarah
+
+10. Admin Profile
+GET /v1/admin/adminProfile
+PUT /v1/admin/adminProfile/update
