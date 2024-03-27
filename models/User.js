@@ -1,72 +1,76 @@
-const { nanoid } = require("nanoid");
+const { nanoid } = require('nanoid');
 
 module.exports = (sequelize, DataTypes) => {
-    const User = sequelize.define(
-      "User",
-      {
-        id_user: {
-          type: DataTypes.STRING,
-          defaultValue: () => nanoid(),
-          primaryKey: true,
-          allowNull: false,
-        },
-        id_gol_darah: {
-          type: DataTypes.STRING,
-          references: {
-            model: "gol_darah",
-            key: "id_gol_darah",
-          },
-          onUpdate: "CASCADE",
-          onDelete: "SET NULL",
-        },
-        nama: {
-          type: DataTypes.STRING,
-          allowNull: false,
-        },
-        email: {
-          type: DataTypes.STRING,
-          allowNull: false,
-          unique: true,
-        },
-        no_hp: {
-          type: DataTypes.STRING,
-          allowNull: false,
-          unique: true,
-        },
-        jenis_kelamin: {
-          type: DataTypes.STRING,
-          allowNull: false,
-          validate: {
-            isIn: [["Laki-laki", "Perempuan"]],
-          },
-        },
-        tanggal_lahir: {
-          type: DataTypes.DATEONLY,
-          allowNull: false,
-        },
-        alamat: {
-          type: DataTypes.STRING,
-          allowNull: false,
-        },
-        password: {
-          type: DataTypes.STRING,
-          allowNull: false,
-        },
-        sts_volunteer: {
-          type: DataTypes.TINYINT,
-          allowNull: false,
-          defaultValue: 0,
-        },
-      },
-      {
-        tableName: "user",
-        timestamps: false,
-      }
-    );
+	const User = sequelize.define(
+		'User',
+		{
+			id_user: {
+				type: DataTypes.STRING,
+				defaultValue: () => nanoid(),
+				primaryKey: true,
+				allowNull: false,
+			},
+			id_gol_darah: {
+				type: DataTypes.STRING,
+				references: {
+					model: 'gol_darah',
+					key: 'id_gol_darah',
+				},
+				onUpdate: 'CASCADE',
+				onDelete: 'SET NULL',
+			},
+			gol_darah: {
+				type: DataTypes.STRING,
+				allowNull: false,
+			},
+			nama: {
+				type: DataTypes.STRING,
+				allowNull: false,
+			},
+			email: {
+				type: DataTypes.STRING,
+				allowNull: false,
+				unique: true,
+			},
+			no_hp: {
+				type: DataTypes.STRING,
+				allowNull: false,
+				unique: true,
+			},
+			jenis_kelamin: {
+				type: DataTypes.STRING,
+				allowNull: false,
+				validate: {
+					isIn: [['Laki-Laki', 'Perempuan']],
+				},
+			},
+			tanggal_lahir: {
+				type: DataTypes.DATEONLY,
+				allowNull: false,
+			},
+			alamat: {
+				type: DataTypes.STRING,
+				allowNull: false,
+			},
+			password: {
+				type: DataTypes.STRING,
+				allowNull: false,
+			},
+			sts_volunteer: {
+				type: DataTypes.TINYINT,
+				allowNull: false,
+				defaultValue: 0,
+			},
+		},
+		{
+			tableName: 'user',
+			timestamps: false,
+		}
+	);
 
-  User.associate = function (models) {
-    User.belongsTo(models.GolDarah, { foreignKey: "id_gol_darah" });
-  };
+	User.associate = function (models) {
+		User.belongsTo(models.GolDarah, { foreignKey: 'id_gol_darah' });
+	};
 
-    return User;
-}
+	return User;
+};
