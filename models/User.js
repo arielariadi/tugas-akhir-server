@@ -19,10 +19,6 @@ module.exports = (sequelize, DataTypes) => {
 				onUpdate: 'CASCADE',
 				onDelete: 'SET NULL',
 			},
-			gol_darah: {
-				type: DataTypes.STRING,
-				allowNull: false,
-			},
 			nama: {
 				type: DataTypes.STRING,
 				allowNull: false,
