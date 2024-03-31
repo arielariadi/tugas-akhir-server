@@ -1,9 +1,10 @@
 module.exports = (sequelize, DataTypes) => {
 	const RequestDarah = sequelize.define(
-		'request_darah',
+		'RequestDarah',
 		{
 			id_request_darah: {
-				type: DataTypes.STRING,
+				type: DataTypes.INTEGER,
+				autoIncrement: true,
 				primaryKey: true,
 				allowNull: false,
 			},
@@ -35,10 +36,6 @@ module.exports = (sequelize, DataTypes) => {
 			},
 			tanggal_request_darah: {
 				type: DataTypes.DATE,
-				allowNull: false,
-			},
-			ktp_image: {
-				type: DataTypes.STRING,
 				allowNull: false,
 			},
 			surat_permohonan_image: {

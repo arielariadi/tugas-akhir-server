@@ -5,7 +5,8 @@ module.exports = {
 	async up(queryInterface, Sequelize) {
 		await queryInterface.createTable('request_darah', {
 			id_request_darah: {
-				type: Sequelize.STRING,
+				type: Sequelize.INTEGER,
+				autoIncrement: true,
 				primaryKey: true,
 				allowNull: false,
 			},
@@ -37,10 +38,6 @@ module.exports = {
 			},
 			tanggal_request_darah: {
 				type: Sequelize.DATE,
-				allowNull: false,
-			},
-			ktp_image: {
-				type: Sequelize.STRING,
 				allowNull: false,
 			},
 			surat_permohonan_image: {

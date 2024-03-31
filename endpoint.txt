@@ -25,15 +25,19 @@ POST /v1/user/jadwal/daftar/cari
 - PUT /v1/user/userProfile/update
 
 7. Dashboard Admin
-GET /v1/admin/dashboardAdmin
+- GET /v1/admin/dashboardAdmin
 
 8. Bank Darah
-GET /v1/admin/bankDarah/:id
-PUT /v1/admin/bankDarah/update/:id
+- GET /v1/admin/bankDarah/:id
+- PUT /v1/admin/bankDarah/update/:id
 
 9. List Pendonor Darah
-GET /v1/admin/pendonorDarah
+- GET /v1/admin/pendonorDarah
 
 10. Admin Profile
-GET /v1/admin/adminProfile
-PUT /v1/admin/adminProfile/update
+- GET /v1/admin/adminProfile
+- PUT /v1/admin/adminProfile/update
+
+**** Tambahan ****
+11. Request Darah
+- POST /v1/user/requestDarah/request

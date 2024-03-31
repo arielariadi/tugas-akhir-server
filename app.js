@@ -12,6 +12,7 @@ var registerRouter = require('./routes/register');
 var profileRouter = require('./routes/profile');
 var adminRouter = require('./routes/admin');
 var jadwalRouter = require('./routes/jadwal');
+var requestDarahRouter = require('./routes/requestDarah');
 var volunteerRouter = require('./routes/volunteer');
 var dashboardRouter = require('./routes/dashboard');
 
@@ -34,6 +35,7 @@ app.use('/v1/auth/register', registerRouter);
 app.use('/v1/user/userProfile', profileRouter);
 app.use('/v1/admin', adminRouter);
 app.use('/v1/user/jadwal', jadwalRouter);
+app.use('/v1/user/requestDarah', requestDarahRouter);
 app.use('/v1/user/volunteer', volunteerRouter);
 app.use('/v1/user/dashboardUser', dashboardRouter);
 
