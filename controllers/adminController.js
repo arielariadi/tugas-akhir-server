@@ -203,6 +203,14 @@ const updateBloodBank = async (req, res) => {
 // Mendapatkan semua data pendonor darah
 const getAllBloodDonors = async (req, res) => {
 	try {
+		const page = parseInt(req.query.page) || 0;
+		const limit = parseInt(req.query.limit) || 5;
+		const offset = page * limit;
+
+		const totalRows = await TraDonor.count();
+
+		const totalPage = Math.ceil(totalRows / limit);
+
 		const pendonor = await TraDonor.findAll({
 			attributes: [
 				'id_tra_donor',
@@ -229,12 +237,21 @@ const getAllBloodDonors = async (req, res) => {
 				{ model: GolDarah, attributes: ['gol_darah'] },
 				{ model: LokasiPmi, attributes: ['nama', 'alamat'] },
 			],
+
+			limit,
+			offset,
+			order: [['id_tra_donor', 'DESC']],
 		});
 
 		if (pendonor.length > 0) {
 			const result = {
 				message: 'Berhasil menampilkan seluruh pendonor darah',
 				pendonor: pendonor,
+
+				page,
+				limit,
+				totalRows,
+				totalPage,
 			};
 			res.json(result);
 		} else {
