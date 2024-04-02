@@ -5,6 +5,7 @@ const {
 	TraDonor,
 	User,
 	Admin,
+	RequestDarah,
 } = require('../models');
 const Validator = require('fastest-validator');
 
@@ -253,7 +254,7 @@ const getAllBloodDonors = async (req, res) => {
 				totalRows,
 				totalPage,
 			};
-			res.json(result);
+			res.status(200).json(result);
 		} else {
 			const error = {
 				message: 'Pendonor darah tidak ditemukan!',
@@ -261,6 +262,117 @@ const getAllBloodDonors = async (req, res) => {
 			};
 			res.status(404).json(error);
 		}
+	} catch (error) {
+		res.status(500).json({
+			message: 'Server Error',
+			serveMessage: error,
+		});
+	}
+};
+
+// Menampilkan semua data permintaan darah
+const getBloodRequest = async (req, res) => {
+	try {
+		const bloodRequestsData = await RequestDarah.findAll({
+			attributes: [
+				'id_request_darah',
+				'id_user',
+				'id_gol_darah',
+				'jumlah_darah',
+				'deskripsi',
+				'tanggal_request_darah',
+				'surat_permohonan_image',
+				'status',
+			],
+
+			include: [
+				{
+					model: User,
+					attributes: [
+						'id_user',
+						'nama',
+						'email',
+						'no_hp',
+						'jenis_kelamin',
+						'tanggal_lahir',
+						'alamat',
+					],
+				},
+				{ model: GolDarah, attributes: ['gol_darah'] },
+			],
+		});
+
+		if (bloodRequestsData.length > 0) {
+			const result = {
+				message: 'Berhasil menampilkan data permintaan darah',
+				bloodRequestsData: bloodRequestsData,
+			};
+			res.status(200).json(result);
+		} else {
+			const error = {
+				message: 'Permintaan darah tidak ditemukan!',
+				bloodRequestsData: null,
+			};
+			res.status(404).json(error);
+		}
+	} catch (error) {
+		res.status(500).json({
+			message: 'Server Error',
+			serveMessage: error,
+		});
+	}
+};
+
+// Menerima permintaan darah user
+const acceptRequestBloodRequest = async (req, res) => {
+	try {
+		const { id_request_darah } = req.body;
+
+		const updateRecord = await RequestDarah.update(
+			{ status: 2 }, // Set status to accepted
+			{ where: { id_request_darah } }
+		);
+
+		if (updateRecord[0] === 0) {
+			const error = {
+				message: 'Permintaan darah tidak ditemukan',
+			};
+			return res.status(404).json(error);
+		}
+
+		const result = {
+			message: 'Permintaan darah diterima',
+		};
+		res.status(200).json(result);
+	} catch (error) {
+		res.status(500).json({
+			message: 'Server Error',
+			serveMessage: error,
+		});
+	}
+};
+
+// Menolak permintaan darah user
+const rejectRequestBloodRequest = async (req, res) => {
+	try {
+		const { id_request_darah } = req.body;
+
+		const updateRecord = await RequestDarah.update(
+			{ status: 0 }, // Set status to rejected
+			{ where: { id_request_darah } }
+		);
+
+		if (updateRecord[0] === 0) {
+			const error = {
+				message: 'Permintaan darah tidak ditemukan',
+			};
+			return res.status(404).json(error);
+		}
+
+		const result = {
+			message: 'Permintaan darah ditolak',
+		};
+		res.status(200).json(result);
 	} catch (error) {
 		res.status(500).json({
 			message: 'Server Error',
@@ -352,6 +464,11 @@ module.exports = {
 	getBloodBank,
 	updateBloodBank,
 	getAllBloodDonors,
+
+	getBloodRequest,
+	acceptRequestBloodRequest,
+	rejectRequestBloodRequest,
+
 	adminProfile,
 	updateAdminProfile,
 };
