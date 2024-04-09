@@ -3,6 +3,7 @@ const {
 	LokasiPmi,
 	TraDonor,
 	User,
+	RequestDarah,
 	sequelize,
 	Sequelize,
 } = require('../models');
@@ -70,7 +71,6 @@ exports.getDashboardUser = async (req, res) => {
 		const response = {
 			success: true,
 			message: 'success',
-			welcome: `Selamat datang, ${user.nama}!`,
 			pendonor: pendonors,
 			page,
 			limit,
@@ -78,9 +78,83 @@ exports.getDashboardUser = async (req, res) => {
 			totalPage,
 		};
 
-		res.json(response); // Mengembalikan objek respons tanpa perlu membungkusnya dalam array
+		res.status(200).json(response); // Mengembalikan objek respons tanpa perlu membungkusnya dalam array
 	} catch (error) {
 		console.error(error);
 		res.status(500).json({ error: 'Internal Server Error' }); // Menangani kesalahan server
+	}
+};
+
+exports.getDashboardUserRequestDarah = async (req, res) => {
+	try {
+		const userId = req.user.userId; // Mengambil ID Pengguna dari permintaan
+		const user = await User.findByPk(userId); // Mengambil informasi pengguna berdasarkan ID
+
+		const page = parseInt(req.query.page) || 0; // Mendapatkan nomor halaman dari query string, defaultnya 0
+		const limit = parseInt(req.query.limit) || 5; // Mendapatkan batas item per halaman dari query string, defaultnya 5
+
+		const offset = page * limit; // Hitung offset berdasarkan halaman
+
+		// Menghitung total baris data permintaan darah yang dimiliki pengguna
+		const totalRows = await RequestDarah.count({ where: { id_user: userId } });
+
+		// Menghitung total halaman berdasarkan total baris dan batas item per halaman
+		const totalPage = Math.ceil(totalRows / limit);
+
+		// Mengambil data permintaan darah dari database berdasarkan ID pengguna
+		const requestDarahs = await RequestDarah.findAll({
+			where: { id_user: userId },
+			include: [
+				{
+					model: User,
+					attributes: [
+						'id_user',
+						'nama',
+						'email',
+						'no_hp',
+						'alamat',
+						'jenis_kelamin',
+						'tanggal_lahir',
+					],
+				},
+				{ model: GolDarah, attributes: ['id_gol_darah', 'gol_darah'] },
+			],
+			limit,
+			offset, // Gunakan offset yang telah dihitung
+			order: [['id_request_darah', 'DESC']], // Tambahkan pengurutan berdasarkan ID donor secara menurun
+		});
+
+		const requestDarahsData = requestDarahs.map(requestDarah => ({
+			id_request_darah: requestDarah.id_request_darah,
+			id_user: requestDarah.id_user,
+			id_gol_darah: requestDarah.id_gol_darah,
+			gol_darah: requestDarah.GolDarah.gol_darah,
+			tanggal_request_darah: requestDarah.tanggal_request_darah
+				? requestDarah.tanggal_request_darah.toISOString().split('T')[0]
+				: null,
+			nama_user: requestDarah.User.nama,
+			jumlah_darah: requestDarah.jumlah_darah,
+			deskripsi: requestDarah.deskripsi,
+			email_user: requestDarah.User.email,
+			no_hp: requestDarah.User.no_hp,
+			alamat: requestDarah.User.alamat,
+			jenis_kelamin: requestDarah.User.jenis_kelamin,
+			status: requestDarah.status,
+		}));
+
+		// Membangun objek respons yang akan dikirim kembali kepada pengguna
+		const response = {
+			success: true,
+			message: 'success',
+			request_darah: requestDarahsData,
+			page,
+			limit,
+			totalRows,
+			totalPage,
+		};
+		res.status(200).json(response);
+	} catch (error) {
+		console.log(error);
+		res.status(500).json({ error: 'Internal Server Error' });
 	}
 };

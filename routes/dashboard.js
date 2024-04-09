@@ -6,5 +6,10 @@ const { authenticateToken } = require('../middleware/middleware');
 
 // Route to get all jadwal data
 router.get('/', authenticateToken, dashboardController.getDashboardUser);
+router.get(
+	'/requestDarah',
+	authenticateToken,
+	dashboardController.getDashboardUserRequestDarah
+);
 
 module.exports = router;
