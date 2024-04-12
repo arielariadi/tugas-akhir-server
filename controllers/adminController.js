@@ -206,6 +206,7 @@ const getAllBloodDonors = async (req, res) => {
 	try {
 		const page = parseInt(req.query.page) || 0;
 		const limit = parseInt(req.query.limit) || 5;
+
 		const offset = page * limit;
 
 		const totalRows = await TraDonor.count();
@@ -273,6 +274,14 @@ const getAllBloodDonors = async (req, res) => {
 // Menampilkan semua data permintaan darah
 const getBloodRequest = async (req, res) => {
 	try {
+		const page = parseInt(req.query.page) || 0;
+		const limit = parseInt(req.query.limit) || 5;
+		const offset = page * limit;
+
+		const totalRows = await RequestDarah.count();
+
+		const totalPage = Math.ceil(totalRows / limit);
+
 		const bloodRequestsData = await RequestDarah.findAll({
 			attributes: [
 				'id_request_darah',
@@ -300,12 +309,21 @@ const getBloodRequest = async (req, res) => {
 				},
 				{ model: GolDarah, attributes: ['gol_darah'] },
 			],
+
+			limit,
+			offset,
+			order: [['id_request_darah', 'DESC']],
 		});
 
 		if (bloodRequestsData.length > 0) {
 			const result = {
 				message: 'Berhasil menampilkan data permintaan darah',
 				bloodRequestsData: bloodRequestsData,
+
+				page,
+				limit,
+				totalRows,
+				totalPage,
 			};
 			res.status(200).json(result);
 		} else {
