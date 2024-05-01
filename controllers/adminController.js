@@ -400,31 +400,74 @@ const getBloodRequest = async (req, res) => {
 };
 
 // Menerima permintaan darah user
+// const acceptRequestBloodRequest = async (req, res) => {
+// 	try {
+// 		const { id_request_darah } = req.body;
+
+// 		const updateRecord = await RequestDarah.update(
+// 			{ status: 2 }, // Set status to accepted
+// 			{ where: { id_request_darah } }
+// 		);
+
+// 		if (updateRecord[0] === 0) {
+// 			const error = {
+// 				message: 'Permintaan darah tidak ditemukan',
+// 			};
+// 			return res.status(404).json(error);
+// 		}
+
+// 		const result = {
+// 			message: 'Permintaan darah diterima',
+// 		};
+// 		res.status(200).json(result);
+// 	} catch (error) {
+// 		res.status(500).json({
+// 			message: 'Server Error',
+// 			serveMessage: error,
+// 		});
+// 	}
+// };
+
 const acceptRequestBloodRequest = async (req, res) => {
 	try {
 		const { id_request_darah } = req.body;
 
-		const updateRecord = await RequestDarah.update(
-			{ status: 2 }, // Set status to accepted
-			{ where: { id_request_darah } }
-		);
+		// Cari permintaan darah berdasarkan ID
+		const requestDarah = await RequestDarah.findByPk(id_request_darah);
 
-		if (updateRecord[0] === 0) {
-			const error = {
-				message: 'Permintaan darah tidak ditemukan',
-			};
-			return res.status(404).json(error);
+		// Jika permintaan darah tidak ditemukan, kirim respons dengan status 404
+		if (!requestDarah) {
+			return res
+				.status(404)
+				.json({ message: 'Permintaan darah tidak ditemukan' });
 		}
 
-		const result = {
-			message: 'Permintaan darah diterima',
-		};
-		res.status(200).json(result);
-	} catch (error) {
-		res.status(500).json({
-			message: 'Server Error',
-			serveMessage: error,
+		// Update status permintaan darah menjadi diterima (status: 2)
+		await RequestDarah.update({ status: 2 }, { where: { id_request_darah } });
+
+		// Ambil data golongan darah dari permintaan
+		const bankDarah = await BankDarah.findOne({
+			where: { id_gol_darah: requestDarah.id_gol_darah },
 		});
+
+		// Kurangi jumlah kantong darah berdasarkan jumlah permintaan
+		const updatedStock =
+			bankDarah.jumlah_kantong_darah - requestDarah.jumlah_darah;
+
+		// Perbarui jumlah kantong darah di database
+		await BankDarah.update(
+			{ jumlah_kantong_darah: updatedStock },
+			{ where: { id_gol_darah: bankDarah.id_gol_darah } }
+		);
+
+		// Kirim respons berhasil
+		return res.status(200).json({ message: 'Permintaan darah diterima' });
+	} catch (error) {
+		// Tangani kesalahan server
+		console.error(error);
+		return res
+			.status(500)
+			.json({ message: 'Server Error', serveMessage: error });
 	}
 };
 
