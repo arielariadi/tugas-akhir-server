@@ -65,6 +65,7 @@ exports.getDashboardUser = async (req, res) => {
 			no_hp: traDonor.User.no_hp,
 			alamat: traDonor.User.alamat,
 			jenis_kelamin: traDonor.User.jenis_kelamin,
+			status: traDonor.status,
 		}));
 
 		// Membangun objek respons yang akan dikirim kembali kepada pengguna

@@ -152,7 +152,7 @@ exports.postJadwalDaftar = async (req, res) => {
 			id_gol_darah,
 			id_lokasi_pmi,
 			tgl_donor,
-			status: 1, // 1 Register
+			status: 1, // 1 = pending, 0 = rejected, 2 = accepted
 		});
 
 		res.json({

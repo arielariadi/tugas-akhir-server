@@ -8,6 +8,8 @@ const {
 	getBloodBank,
 	updateBloodBank,
 	getAllBloodDonors,
+	acceptBloodDonorRegistration,
+	rejectBloodDonorRegistration,
 
 	getBloodRequest,
 	acceptRequestBloodRequest,
@@ -23,7 +25,10 @@ router.get('/dashboardAdmin', getAllBloodBank);
 // router.put("/bankDarah/update/:id", updateBloodBankByPmiId);
 router.get('/bankDarah', getBloodBank);
 router.put('/bankDarah/update', updateBloodBank);
+
 router.get('/pendonorDarah', getAllBloodDonors);
+router.post('/pendonorDarah/accept', acceptBloodDonorRegistration);
+router.post('/pendonorDarah/reject', rejectBloodDonorRegistration);
 
 router.get('/requestDarah', authenticateToken, getBloodRequest);
 router.post(

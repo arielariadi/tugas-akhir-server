@@ -271,6 +271,64 @@ const getAllBloodDonors = async (req, res) => {
 	}
 };
 
+// Menerima pendaftaran donor darah user
+const acceptBloodDonorRegistration = async (req, res) => {
+	try {
+		const { id_tra_donor } = req.body;
+
+		const updateRecord = await TraDonor.update(
+			{ status: 2 }, // Set status to accepted
+			{ where: { id_tra_donor } }
+		);
+
+		if (updateRecord[0] === 0) {
+			const error = {
+				message: 'Pendaftaran donor darah tidak ditemukan',
+			};
+			return res.status(404).json(error);
+		}
+
+		const result = {
+			message: 'Pendaftaran donor darah diterima',
+		};
+		res.status(200).json(result);
+	} catch (error) {
+		res.status(500).json({
+			message: 'Server Error',
+			serveMessage: error,
+		});
+	}
+};
+
+// Menolak pendaftaran donor darah user
+const rejectBloodDonorRegistration = async (req, res) => {
+	try {
+		const { id_tra_donor } = req.body;
+
+		const updateRecord = await TraDonor.update(
+			{ status: 0 }, // Set status to rejected
+			{ where: { id_tra_donor } }
+		);
+
+		if (updateRecord[0] === 0) {
+			const error = {
+				message: 'Pendaftaran donor darah tidak ditemukan',
+			};
+			return res.status(404).json(error);
+		}
+
+		const result = {
+			message: 'Pendaftaran donor darah ditolak',
+		};
+		res.status(200).json(result);
+	} catch (error) {
+		res.status(500).json({
+			message: 'Server Error',
+			serveMessage: error,
+		});
+	}
+};
+
 // Menampilkan semua data permintaan darah
 const getBloodRequest = async (req, res) => {
 	try {
@@ -482,6 +540,8 @@ module.exports = {
 	getBloodBank,
 	updateBloodBank,
 	getAllBloodDonors,
+	acceptBloodDonorRegistration,
+	rejectBloodDonorRegistration,
 
 	getBloodRequest,
 	acceptRequestBloodRequest,
