@@ -140,6 +140,7 @@ exports.getDashboardUserRequestDarah = async (req, res) => {
 			no_hp: requestDarah.User.no_hp,
 			alamat: requestDarah.User.alamat,
 			jenis_kelamin: requestDarah.User.jenis_kelamin,
+			bukti_foto: requestDarah.bukti_foto,
 			status: requestDarah.status,
 		}));
 

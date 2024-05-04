@@ -31,7 +31,7 @@ const requestDarah = async (req, res) => {
 			deskripsi,
 			tanggal_request_darah: new Date(),
 			status: 1, // Set status to pending
-			surat_permohonan_image: req.file.filename, // Save image buffer
+			surat_permohonan_image: req.file.filename,
 		});
 
 		res.status(201).json({ success: true, data: newRequest });

@@ -19,6 +19,7 @@ const {
 	updateAdminProfile,
 } = require('../controllers/adminController');
 const { authenticateToken } = require('../middleware/middleware');
+const buktiFoto = require('../middleware/buktiFoto');
 
 router.get('/dashboardAdmin', getAllBloodBank);
 // router.get('/bankDarah/:id', getBloodBankByPmiId);
@@ -31,10 +32,19 @@ router.post('/pendonorDarah/accept', acceptBloodDonorRegistration);
 router.post('/pendonorDarah/reject', rejectBloodDonorRegistration);
 
 router.get('/requestDarah', authenticateToken, getBloodRequest);
+// router.post(
+// 	'/requestDarah/accept',
+// 	authenticateToken,
+// 	acceptRequestBloodRequest
+// );
 router.post(
 	'/requestDarah/accept',
 	authenticateToken,
-	acceptRequestBloodRequest
+	buktiFoto.single('bukti_foto'),
+	(req, res) => {
+		console.log('Received POST request at /v1/admin/requestDarah/accept');
+		acceptRequestBloodRequest(req, res);
+	}
 );
 router.post(
 	'/requestDarah/reject',

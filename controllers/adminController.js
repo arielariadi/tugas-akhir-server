@@ -349,6 +349,7 @@ const getBloodRequest = async (req, res) => {
 				'deskripsi',
 				'tanggal_request_darah',
 				'surat_permohonan_image',
+				'bukti_foto',
 				'status',
 			],
 
@@ -400,36 +401,9 @@ const getBloodRequest = async (req, res) => {
 };
 
 // Menerima permintaan darah user
-// const acceptRequestBloodRequest = async (req, res) => {
-// 	try {
-// 		const { id_request_darah } = req.body;
-
-// 		const updateRecord = await RequestDarah.update(
-// 			{ status: 2 }, // Set status to accepted
-// 			{ where: { id_request_darah } }
-// 		);
-
-// 		if (updateRecord[0] === 0) {
-// 			const error = {
-// 				message: 'Permintaan darah tidak ditemukan',
-// 			};
-// 			return res.status(404).json(error);
-// 		}
-
-// 		const result = {
-// 			message: 'Permintaan darah diterima',
-// 		};
-// 		res.status(200).json(result);
-// 	} catch (error) {
-// 		res.status(500).json({
-// 			message: 'Server Error',
-// 			serveMessage: error,
-// 		});
-// 	}
-// };
-
 const acceptRequestBloodRequest = async (req, res) => {
 	try {
+		console.log('Processing request to accept blood request');
 		const { id_request_darah } = req.body;
 
 		// Cari permintaan darah berdasarkan ID
@@ -460,11 +434,19 @@ const acceptRequestBloodRequest = async (req, res) => {
 			{ where: { id_gol_darah: bankDarah.id_gol_darah } }
 		);
 
+		// Upload bukti foto
+		await RequestDarah.update(
+			{
+				bukti_foto: req.file.filename,
+			},
+			{ where: { id_request_darah: requestDarah.id_request_darah } }
+		);
+
 		// Kirim respons berhasil
 		return res.status(200).json({ message: 'Permintaan darah diterima' });
 	} catch (error) {
 		// Tangani kesalahan server
-		console.error(error);
+		console.error('Error in acceptRequestBloodRequest:', error);
 		return res
 			.status(500)
 			.json({ message: 'Server Error', serveMessage: error });
