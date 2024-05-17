@@ -17,7 +17,7 @@ exports.registerUser = async (req, res) => {
 		nama: 'string',
 		email: 'email',
 		password: 'string|min:6',
-		alamat: 'string',
+		desa: 'string',
 		jenis_kelamin: 'string',
 		tanggal_lahir: {
 			type: 'date',

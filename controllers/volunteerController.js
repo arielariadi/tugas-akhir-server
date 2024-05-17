@@ -3,7 +3,7 @@ const { GolDarah, User, TraReqDarah } = require('../models');
 
 exports.getVolunteer = async (req, res) => {
 	try {
-		const { id_gol_darah, alamat } = req.query;
+		const { id_gol_darah, desa } = req.query;
 
 		// Dapatkan ID user dari req.user
 		const userId = req.user.userId;
@@ -17,8 +17,8 @@ exports.getVolunteer = async (req, res) => {
 				},
 				sts_volunteer: 1,
 				id_gol_darah: id_gol_darah,
-				alamat: {
-					[Op.like]: `%${alamat}%`,
+				desa: {
+					[Op.like]: `%${desa}%`,
 				},
 			},
 			include: [
@@ -38,7 +38,7 @@ exports.getVolunteer = async (req, res) => {
 			no_hp: volunteer.no_hp,
 			jenis_kelamin: volunteer.jenis_kelamin,
 			tanggal_lahir: volunteer.tanggal_lahir,
-			alamat: volunteer.alamat,
+			desa: volunteer.desa,
 			password: volunteer.password,
 			sts_volunteer: volunteer.sts_volunteer,
 			gol_darah: volunteer['GolDarah.gol_darah'],
@@ -53,7 +53,7 @@ exports.getVolunteer = async (req, res) => {
 
 exports.requestVolunteer = async (req, res) => {
 	try {
-		const { id_user, nama, gol_darah, alamat } = req.body; // milik si volunteer
+		const { id_user, nama, gol_darah, desa } = req.body; // milik si volunteer
 
 		// Dapatkan ID user dari req.user
 		const id_user_req = req.user.userId;
@@ -64,7 +64,7 @@ exports.requestVolunteer = async (req, res) => {
 				id_user,
 				sts_volunteer: 1,
 				id_gol_darah: gol_darah,
-				alamat,
+				desa,
 			},
 		});
 

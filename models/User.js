@@ -44,7 +44,7 @@ module.exports = (sequelize, DataTypes) => {
 				type: DataTypes.DATEONLY,
 				allowNull: false,
 			},
-			alamat: {
+			desa: {
 				type: DataTypes.STRING,
 				allowNull: false,
 			},
