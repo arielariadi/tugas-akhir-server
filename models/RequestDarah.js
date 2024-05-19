@@ -26,6 +26,18 @@ module.exports = (sequelize, DataTypes) => {
 				onUpdate: 'CASCADE',
 				onDelete: 'SET NULL',
 			},
+			nama_pasien: {
+				type: DataTypes.STRING,
+				allowNull: false,
+			},
+			rumah_sakit: {
+				type: DataTypes.STRING,
+				allowNull: false,
+			},
+			komponen_darah: {
+				type: DataTypes.STRING,
+				allowNull: false,
+			},
 			jumlah_darah: {
 				type: DataTypes.INTEGER,
 				allowNull: false,

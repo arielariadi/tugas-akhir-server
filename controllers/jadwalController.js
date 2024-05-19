@@ -163,6 +163,11 @@ exports.postJadwalDaftar = async (req, res) => {
 				gol_darah: golDarah.gol_darah,
 				lokasi_pmi: lokasiPmi.nama,
 				tanggal_donor: newDonorRegistration.tgl_donor,
+				// alamat_rumah: User.alamat_rumah,
+				// desa: User.desa,
+				// kecamatan: User.kecamatan,
+				// kota: User.kota,
+				// pekerjaan: User.pekerjaan,
 				message: 'Donor registration successful',
 			},
 		});

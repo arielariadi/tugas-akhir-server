@@ -3,7 +3,14 @@ const { RequestDarah, User, GolDarah } = require('../models');
 const requestDarah = async (req, res) => {
 	try {
 		// Destructuring data from request body
-		const { id_gol_darah, jumlah_darah, deskripsi } = req.body;
+		const {
+			id_gol_darah,
+			nama_pasien,
+			rumah_sakit,
+			komponen_darah,
+			jumlah_darah,
+			deskripsi,
+		} = req.body;
 
 		console.log('Request received:', req.body); // Untuk melihat body permintaan
 		const id_user = req.user.userId; // Get user ID from authenticated user
@@ -27,6 +34,9 @@ const requestDarah = async (req, res) => {
 		const newRequest = await RequestDarah.create({
 			id_user,
 			id_gol_darah,
+			nama_pasien,
+			rumah_sakit,
+			komponen_darah,
 			jumlah_darah,
 			deskripsi,
 			tanggal_request_darah: new Date(),

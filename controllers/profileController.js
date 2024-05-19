@@ -35,9 +35,14 @@ exports.updateUserProfile = async (req, res) => {
 		}
 
 		const schema = {
+			nik: 'string|optional',
 			nama: 'string|optional',
 			email: 'email|optional',
+			alamat_rumah: 'string|optional',
 			desa: 'string|optional',
+			kecamatan: 'string|optional',
+			kota: 'string|optional',
+			pekerjaan: 'string|optional',
 			jenis_kelamin: 'string|optional',
 			tanggal_lahir: {
 				type: 'date',

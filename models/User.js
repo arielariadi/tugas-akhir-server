@@ -19,6 +19,11 @@ module.exports = (sequelize, DataTypes) => {
 				onUpdate: 'CASCADE',
 				onDelete: 'SET NULL',
 			},
+			nik: {
+				type: DataTypes.STRING,
+				allowNull: false,
+				unique: true,
+			},
 			nama: {
 				type: DataTypes.STRING,
 				allowNull: false,
@@ -44,7 +49,23 @@ module.exports = (sequelize, DataTypes) => {
 				type: DataTypes.DATEONLY,
 				allowNull: false,
 			},
+			alamat_rumah: {
+				type: DataTypes.STRING,
+				allowNull: false,
+			},
 			desa: {
+				type: DataTypes.STRING,
+				allowNull: false,
+			},
+			kecamatan: {
+				type: DataTypes.STRING,
+				allowNull: false,
+			},
+			kota: {
+				type: DataTypes.STRING,
+				allowNull: false,
+			},
+			pekerjaan: {
 				type: DataTypes.STRING,
 				allowNull: false,
 			},

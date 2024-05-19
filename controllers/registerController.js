@@ -14,10 +14,15 @@ const v = new Validator({
 // Controller function for user registration
 exports.registerUser = async (req, res) => {
 	const schema = {
+		nik: 'string',
 		nama: 'string',
 		email: 'email',
 		password: 'string|min:6',
+		alamat_rumah: 'string',
 		desa: 'string',
+		kecamatan: 'string',
+		kota: 'string',
+		pekerjaan: 'string',
 		jenis_kelamin: 'string',
 		tanggal_lahir: {
 			type: 'date',
