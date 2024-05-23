@@ -36,6 +36,7 @@ exports.getDashboardUser = async (req, res) => {
 					model: User,
 					attributes: [
 						'id_user',
+						'nik',
 						'nama',
 						'email',
 						'no_hp',
@@ -64,6 +65,7 @@ exports.getDashboardUser = async (req, res) => {
 			tanggal_donor: traDonor.tgl_donor
 				? traDonor.tgl_donor.toISOString().split('T')[0]
 				: null,
+			nik: traDonor.User.nik,
 			nama_user: traDonor.User.nama,
 			email_user: traDonor.User.email,
 			no_hp: traDonor.User.no_hp,

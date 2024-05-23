@@ -228,6 +228,7 @@ const getAllBloodDonors = async (req, res) => {
 					model: User,
 					attributes: [
 						'id_user',
+						'nik',
 						'nama',
 						'email',
 						'no_hp',
