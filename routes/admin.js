@@ -11,6 +11,10 @@ const {
 	acceptBloodDonorRegistration,
 	rejectBloodDonorRegistration,
 
+	getAllAcceptedBloodDonors,
+	acceptValidationBloodDonor,
+	rejectValidationBloodDonor,
+
 	getBloodRequest,
 	acceptRequestBloodRequest,
 	rejectRequestBloodRequest,
@@ -30,6 +34,16 @@ router.put('/bankDarah/update', updateBloodBank);
 router.get('/pendonorDarah', getAllBloodDonors);
 router.post('/pendonorDarah/accept', acceptBloodDonorRegistration);
 router.post('/pendonorDarah/reject', rejectBloodDonorRegistration);
+
+router.get('/showAcceptedCalonPendonorDarah', getAllAcceptedBloodDonors);
+router.post(
+	'/showAcceptedCalonPendonorDarah/acceptValidation',
+	acceptValidationBloodDonor
+);
+router.post(
+	'/showAcceptedCalonPendonorDarah/rejectValidation',
+	rejectValidationBloodDonor
+);
 
 router.get('/requestDarah', authenticateToken, getBloodRequest);
 // router.post(

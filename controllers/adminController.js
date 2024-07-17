@@ -6,6 +6,7 @@ const {
 	User,
 	Admin,
 	RequestDarah,
+	ValidasiPendonor,
 } = require('../models');
 const Validator = require('fastest-validator');
 
@@ -205,7 +206,7 @@ const updateBloodBank = async (req, res) => {
 const getAllBloodDonors = async (req, res) => {
 	try {
 		const page = parseInt(req.query.page) || 0;
-		const limit = parseInt(req.query.limit) || 5;
+		const limit = parseInt(req.query.limit) || 10;
 
 		const offset = page * limit;
 
@@ -293,8 +294,33 @@ const acceptBloodDonorRegistration = async (req, res) => {
 			return res.status(404).json(error);
 		}
 
+		// Retrieve the donor record from TraDonor
+		const donorRecord = await TraDonor.findOne({
+			where: { id_tra_donor },
+			attributes: [
+				'id_tra_donor',
+				'id_user',
+				'id_gol_darah',
+				'id_lokasi_pmi',
+				'tgl_donor',
+			],
+		});
+
+		// Insert the record into ValidasiPendonor
+		const validasiPendonorRecord = await ValidasiPendonor.create({
+			id_tra_donor: donorRecord.id_tra_donor,
+			id_user: donorRecord.id_user,
+			id_gol_darah: donorRecord.id_gol_darah,
+			id_lokasi_pmi: donorRecord.id_lokasi_pmi,
+			tgl_donor: donorRecord.tgl_donor, // Ambil dan masukkan tanggal donor dari TraDonor
+			jumlah_kantung_darah: null, // Atur jumlah kantung darah sesuai kebutuhan
+			status: 2, // Set status to approved
+			alasan_gagal_donor: null, // Atur alasan jika gagal
+		});
+
 		const result = {
 			message: 'Pendaftaran donor darah diterima',
+			validasiPendonorRecord,
 		};
 		res.status(200).json(result);
 	} catch (error) {
@@ -334,11 +360,189 @@ const rejectBloodDonorRegistration = async (req, res) => {
 	}
 };
 
+const { Op } = require('sequelize');
+// Mendapatkan semua calon pendonor yang diterima
+const getAllAcceptedBloodDonors = async (req, res) => {
+	try {
+		const page = parseInt(req.query.page) || 0;
+		const limit = parseInt(req.query.limit) || 10;
+
+		const offset = page * limit;
+
+		const totalRows = await ValidasiPendonor.count();
+
+		const totalPage = Math.ceil(totalRows / limit);
+
+		const validasiPendonors = await ValidasiPendonor.findAll({
+			where: {
+				status: {
+					[Op.or]: [2, 3, 4],
+				},
+			},
+			attributes: [
+				'id_validasi_pendonor',
+				'id_tra_donor',
+				'id_user',
+				'id_gol_darah',
+				'id_lokasi_pmi',
+				'jumlah_kantung_darah',
+				'tgl_donor',
+				'alasan_gagal_donor',
+				'status',
+			],
+
+			include: [
+				{
+					model: User,
+					attributes: [
+						'id_user',
+						'nik',
+						'nama',
+						'email',
+						'no_hp',
+						'jenis_kelamin',
+						'tanggal_lahir',
+						'alamat_rumah',
+						'desa',
+						'kecamatan',
+						'kota',
+						'pekerjaan',
+					],
+				},
+				{ model: GolDarah, attributes: ['gol_darah'] },
+				{ model: LokasiPmi, attributes: ['nama', 'alamat'] },
+			],
+
+			limit,
+			offset,
+			order: [['id_tra_donor', 'DESC']],
+		});
+		const result = {
+			message: 'Berhasil menampilkan semua pendonor darah yang diterima',
+			validasi_pendonor: validasiPendonors,
+
+			page,
+			limit,
+			totalRows,
+			totalPage,
+		};
+		res.status(200).json(result);
+	} catch (error) {
+		res.status(500).json({
+			message: 'Server Error',
+			serveMessage: error,
+		});
+	}
+};
+
+// Menerima validasi pendonor darah
+const acceptValidationBloodDonor = async (req, res) => {
+	try {
+		const { id_validasi_pendonor, jumlah_kantung_darah, alasan_gagal_donor } =
+			req.body;
+
+		// Cari validasi pendonor berdasarkan ID
+		const validasiPendonor = await ValidasiPendonor.findByPk(
+			id_validasi_pendonor,
+			{
+				include: [TraDonor], // Sertakan TraDonor untuk mendapatkan id_gol_darah dan id_lokasi_pmi
+			}
+		);
+
+		// Jika validasi pendonor tidak ditemukan, kirim respons dengan status 404
+		if (!validasiPendonor) {
+			return res
+				.status(404)
+				.json({ message: 'Validasi calon pendonor tidak ditemukan' });
+		}
+
+		// Update data validasi pendonor
+		await ValidasiPendonor.update(
+			{
+				jumlah_kantung_darah,
+				alasan_gagal_donor,
+				status: 3, // Set status to approved
+			},
+			{ where: { id_validasi_pendonor } }
+		);
+
+		// Ambil data stok darah berdasarkan golongan darah dari TraDonor
+		const bankDarah = await BankDarah.findOne({
+			where: { id_gol_darah: validasiPendonor.id_gol_darah },
+		});
+
+		// Jika bank darah tidak ditemukan, kirim respons dengan status 404
+		if (!bankDarah) {
+			return res
+				.status(404)
+				.json({ message: 'Data bank darah tidak ditemukan' });
+		}
+
+		// Tambah jumlah kantung darah dari bank darah
+		bankDarah.jumlah_kantong_darah =
+			Number(bankDarah.jumlah_kantong_darah) + Number(jumlah_kantung_darah); // Harus teliti, karena nama fieldnya berbeda antara kantung dan kantong
+		await bankDarah.save();
+
+		// Kirim respons berhasil
+		return res
+			.status(200)
+			.json({ message: 'Validasi calon pendonor diterima' });
+	} catch (error) {
+		// Tangani kesalahan server
+		console.error('Error in acceptValidationBloodDonor:', error);
+		return res
+			.status(500)
+			.json({ message: 'Server Error', serveMessage: error.message });
+	}
+};
+
+// Menolak validasi pendonor darah
+const rejectValidationBloodDonor = async (req, res) => {
+	try {
+		const { id_validasi_pendonor, jumlah_kantung_darah, alasan_gagal_donor } =
+			req.body;
+
+		// Cari validasi pendonor berdasarkan ID
+		const validasiPendonor = await ValidasiPendonor.findByPk(
+			id_validasi_pendonor,
+			{
+				include: [TraDonor], // Sertakan TraDonor untuk mendapatkan id_gol_darah dan id_lokasi_pmi
+			}
+		);
+
+		// Jika validasi pendonor tidak ditemukan, kirim respons dengan status 404
+		if (!validasiPendonor) {
+			return res
+				.status(404)
+				.json({ message: 'Validasi calon pendonor tidak ditemukan' });
+		}
+
+		// Update data validasi pendonor
+		await ValidasiPendonor.update(
+			{
+				jumlah_kantung_darah,
+				alasan_gagal_donor,
+				status: 4, // Set status to rejected
+			},
+			{ where: { id_validasi_pendonor } }
+		);
+
+		// Kirim respons berhasil
+		return res.status(200).json({ message: 'Validasi calon pendonor ditolak' });
+	} catch (error) {
+		// Tangani kesalahan server
+		console.error('Error in acceptValidationBloodDonor:', error);
+		return res
+			.status(500)
+			.json({ message: 'Server Error', serveMessage: error.message });
+	}
+};
+
 // Menampilkan semua data permintaan darah
 const getBloodRequest = async (req, res) => {
 	try {
 		const page = parseInt(req.query.page) || 0;
-		const limit = parseInt(req.query.limit) || 5;
+		const limit = parseInt(req.query.limit) || 10;
 		const offset = page * limit;
 
 		const totalRows = await RequestDarah.count();
@@ -578,6 +782,10 @@ module.exports = {
 	getAllBloodDonors,
 	acceptBloodDonorRegistration,
 	rejectBloodDonorRegistration,
+
+	getAllAcceptedBloodDonors,
+	acceptValidationBloodDonor,
+	rejectValidationBloodDonor,
 
 	getBloodRequest,
 	acceptRequestBloodRequest,
